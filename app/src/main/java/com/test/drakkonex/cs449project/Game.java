@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -17,22 +16,22 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 
-public class BrickBreaker extends Activity{
+public class Game extends Activity{
 
     // for instantiating the game
-    BrickBreakerView brickBreakerView;
+    GameView GameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         //initializes the game
-        brickBreakerView = new BrickBreakerView(this);
-        setContentView(brickBreakerView);
+        GameView = new GameView(this);
+        setContentView(GameView);
     }
 
-    //Now the base game class, BrickBreakerView is created
-    class BrickBreakerView extends SurfaceView implements Runnable{
+    //Now the base game class, GameView is created
+    class GameView extends SurfaceView implements Runnable{
 
         //create the game thread
         Thread gameThread = null;
@@ -67,7 +66,7 @@ public class BrickBreaker extends Activity{
         Ball ball;
 
         //Creates the bricks to be targeted
-        Brick[] bricks = new Brick[100];
+        Brick[] bricks = new Brick[200];
         int numBr = 0;
 
         //storing the score and lives
@@ -75,7 +74,7 @@ public class BrickBreaker extends Activity{
         int lives = 3;
 
         //constructor to set up game
-        public BrickBreakerView(Context context){
+        public GameView(Context context){
 
             super(context);
 
@@ -92,7 +91,7 @@ public class BrickBreaker extends Activity{
             sizeY = size.y;
 
             pad = new Pad(sizeX,sizeY);
-            ball = new Ball(sizeX,sizeY);
+            ball = new Ball();
 
             restartGame();
         }
@@ -101,12 +100,12 @@ public class BrickBreaker extends Activity{
 
             //generate ball
             ball.reset(sizeX,sizeY);
-            int brickW = sizeX/10;
-            int brickH = sizeY/12;
+            int brickW = sizeX/8;
+            int brickH = sizeY/10;
 
             //generates bricks
             numBr = 0;
-            for(int c = 0; c < 10; c++){
+            for(int c = 0; c < 8; c++){
                 for(int r = 0; r < 3; r++){
                     bricks[numBr++]=new Brick(r,c,brickW,brickH);
                 }
@@ -158,11 +157,13 @@ public class BrickBreaker extends Activity{
 
                 }
             }
+            // pad and ball collision
             if(RectF.intersects(pad.getRect(),ball.getRect())){
                 ball.setRandomXVelocity();
                 ball.reverseYVelocity();
                 ball.clearObstacleY(pad.getRect().top-2);
             }
+            // ball hits bottom of screen
             if(ball.getRect().bottom > sizeY){
                 ball.reverseYVelocity();
                 ball.clearObstacleY(sizeY - 2);
@@ -173,17 +174,17 @@ public class BrickBreaker extends Activity{
                     restartGame();
                 }
             }
-
+            //ball hits top
             if(ball.getRect().top < 0){
                 ball.reverseYVelocity();
                 ball.clearObstacleY(12);
             }
-
+            // ball hits leftside
             if(ball.getRect().left < 0){
                 ball.reverseXVelocity();
                 ball.clearObstacleX(2);
             }
-
+            //ball hits rightside
             if (ball.getRect().right > (sizeX-10)){
                 ball.reverseXVelocity();
                 ball.clearObstacleX(sizeX - 22);
@@ -203,9 +204,11 @@ public class BrickBreaker extends Activity{
                 canvas = surfaceHolder.lockCanvas();
 
                 //background color
-                canvas.drawColor(Color.argb(0,0,0,0));
+                canvas.drawColor(Color.argb(255, 95, 244, 66));
 
-                paint.setColor(Color.argb(255,255,255,255));
+
+               // paint.setColor(Color.argb(255,255,255,255));
+                paint.setColor(Color.argb(255, 255, 0, 0));
 
                 //pad
                 canvas.drawRect(pad.getRect(),paint);
@@ -213,7 +216,7 @@ public class BrickBreaker extends Activity{
                 //ball
                 canvas.drawRect(ball.getRect(),paint);
 
-                paint.setColor(Color.argb(255,255,0,0));
+                paint.setColor(Color.argb(255, 11, 91, 188));
 
                 for (int i = 0; i < numBr; i++){
                     if(bricks[i].getVisibility()){
@@ -221,7 +224,7 @@ public class BrickBreaker extends Activity{
                     }
                 }
 
-                paint.setColor(Color.argb(255,255,255,255));
+                paint.setColor(Color.argb(255, 255, 255, 255));
 
                 paint.setTextSize(40);
                 canvas.drawText("Score: "+ score+ "  Lives: "+lives, 10,50,paint);
@@ -282,14 +285,14 @@ public class BrickBreaker extends Activity{
     protected void onResume(){
         super.onResume();
 
-        brickBreakerView.resume();
+        GameView.resume();
     }
 
     @Override
     protected void onPause(){
         super.onPause();
 
-        brickBreakerView.pause();
+        GameView.pause();
     }
 
 }

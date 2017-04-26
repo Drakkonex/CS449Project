@@ -16,7 +16,7 @@ public class Ball {
     float height = 10;
     // creates the variables for the ball
 
-    public Ball(int sX, int sY){
+    public Ball(){
 
         xVel = 200;
         yVel = -400;
@@ -30,8 +30,8 @@ public class Ball {
     }
 
     public void update(long fps){
-        rectF.left = rectF.left + xVel/fps;
-        rectF.top = rectF.top + yVel/fps;
+        rectF.left = rectF.left + (xVel/fps);
+        rectF.top = rectF.top + (yVel/fps);
         rectF.right = rectF.left + width;
         rectF.bottom = rectF.top - height;
     }
